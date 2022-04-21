@@ -110,7 +110,7 @@ describe('Note app', function() {
         cy.createBlog({ author: 'cypress', 'title': 'Third blog', url: 'localhost', likes: '0' })
       })
 
-      it.only('blog list is correctly ordered', function() {
+      it('blog list is correctly ordered', function() {
         cy.get('.blog-body').then((blogs) => {
           let currentLikes = blogs[0].children[1].textContent.match(/(?<=likes )\d/)[0]
           blogs.each(function (i) {
