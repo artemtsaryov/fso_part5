@@ -68,7 +68,7 @@ describe('Note app', function() {
 
         cy.get('.blog-body').as('blog')
         cy.get('@blog').contains('likes 0')
-        cy.get('@blog').get('button').contains('like').click()
+        cy.get('@blog').find('button').contains('like').click()
 
         cy.get('@blog').contains('likes 1')
       })
@@ -77,7 +77,7 @@ describe('Note app', function() {
         cy.contains('view').click()
 
         cy.get('.blog-body').as('blog')
-        cy.get('@blog').get('button').contains('remove').click()
+        cy.get('@blog').find('button').contains('remove').click()
 
         cy.get('.success').should('contain', 'test blog from cypress')
         cy.get('.success').should('have.css', 'color', 'rgb(0, 128, 0)')
@@ -110,11 +110,31 @@ describe('Note app', function() {
         cy.createBlog({ author: 'cypress', 'title': 'Third blog', url: 'localhost', likes: '0' })
       })
 
-      it('blog list is correctly ordered', function() {
+      it.only('blog list is correctly ordered', function() {
         cy.get('.blog-body').then((blogs) => {
           let currentLikes = blogs[0].children[1].textContent.match(/(?<=likes )\d/)[0]
           blogs.each(function (i) {
-            expect(this.children[1].textContent.match(/(?<=likes )\d/)[0] <= currentLikes).to.be.true
+            const targetLikes = Number(this.children[1].textContent.match(/(?<=likes )\d/)[0])
+            expect( targetLikes <= currentLikes).to.be.true
+            currentLikes = targetLikes
+          })
+        })
+
+        cy.contains('Third blog').contains('view').click()
+
+        cy.contains('Third blog').parent().contains('like').click()
+        cy.get('.success').should('contain', 'received a new like')
+        cy.get('.success', { timeout: 6000 }).should('not.exist')
+
+        cy.contains('Third blog').parent().contains('like').click()
+        cy.get('.success').should('contain', 'received a new like')
+
+        cy.get('.blog-body').then((blogs) => {
+          let currentLikes = blogs[0].children[1].textContent.match(/(?<=likes )\d/)[0]
+          blogs.each(function (i) {
+            const targetLikes = Number(this.children[1].textContent.match(/(?<=likes )\d/)[0])
+            expect( targetLikes <= currentLikes).to.be.true
+            currentLikes = targetLikes
           })
         })
       })
